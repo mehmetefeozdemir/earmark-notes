@@ -2,32 +2,47 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 const TICK_MS = 250
 
-/** Elapsed-time clock used as the session timeline until real recording lands. */
+/**
+ * Active-time clock for the current recording. Paused time is excluded, so `now()`
+ * always matches the position in the recorded audio.
+ */
 export const useStopwatch = () => {
-  const startedAtRef = useRef<number | null>(null)
+  const accumulatedRef = useRef(0)
+  const segmentStartRef = useRef<number | null>(null)
   const [elapsedMs, setElapsedMs] = useState(0)
   const [isRunning, setIsRunning] = useState(false)
 
+  const now = useCallback(() => {
+    const running =
+      segmentStartRef.current === null ? 0 : performance.now() - segmentStartRef.current
+    return Math.round(accumulatedRef.current + running)
+  }, [])
+
   useEffect(() => {
     if (!isRunning) return undefined
-    const interval = window.setInterval(() => {
-      if (startedAtRef.current !== null) setElapsedMs(performance.now() - startedAtRef.current)
-    }, TICK_MS)
+    const interval = window.setInterval(() => setElapsedMs(now()), TICK_MS)
     return () => window.clearInterval(interval)
-  }, [isRunning])
+  }, [isRunning, now])
 
   const start = useCallback(() => {
-    startedAtRef.current = performance.now() - elapsedMs
+    if (segmentStartRef.current !== null) return
+    segmentStartRef.current = performance.now()
     setIsRunning(true)
-  }, [elapsedMs])
+  }, [])
 
-  const pause = useCallback(() => setIsRunning(false), [])
+  const pause = useCallback(() => {
+    accumulatedRef.current = now()
+    segmentStartRef.current = null
+    setElapsedMs(accumulatedRef.current)
+    setIsRunning(false)
+  }, [now])
 
-  const now = useCallback(
-    () =>
-      startedAtRef.current === null ? 0 : Math.round(performance.now() - startedAtRef.current),
-    [],
-  )
+  const reset = useCallback(() => {
+    accumulatedRef.current = 0
+    segmentStartRef.current = null
+    setElapsedMs(0)
+    setIsRunning(false)
+  }, [])
 
-  return { elapsedMs, isRunning, start, pause, now }
+  return { elapsedMs, isRunning, start, pause, reset, now }
 }

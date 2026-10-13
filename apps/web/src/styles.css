@@ -2,10 +2,14 @@
   --bg: #fafafa;
   --fg: #1a1a1a;
   --muted: #6b6b6b;
+  --line: color-mix(in srgb, var(--muted) 30%, transparent);
   --accent: #2f6fed;
+  --record: #d93636;
   --important: #d93636;
   --question: #d97a00;
   --confused: #1a9a86;
+  --info-bg: #e8f0fe;
+  --error-bg: #fde8e8;
   color-scheme: light dark;
   font-family: system-ui, sans-serif;
 }
@@ -15,6 +19,8 @@
     --bg: #141414;
     --fg: #ededed;
     --muted: #9a9a9a;
+    --info-bg: #1b2a44;
+    --error-bg: #3d1a1a;
   }
 }
 
@@ -30,34 +36,80 @@ body {
   padding: 24px 16px;
 }
 
-.app__header {
+.session-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.session-header h1 {
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+.recording-controls {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 8px;
 }
 
-.app__header h1 {
-  flex: 1;
-  font-size: 1.4rem;
-}
-
-.app__clock {
+.recording-controls__clock {
   font-variant-numeric: tabular-nums;
   font-size: 1.2rem;
+  min-width: 4ch;
 }
 
-.app__composer {
+.recording-controls__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+.recording-controls__dot--recording {
+  background: var(--record);
+}
+
+.banner {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  margin: 12px 0;
+  border-radius: 6px;
+  background: var(--info-bg);
+}
+
+.banner--error {
+  background: var(--error-bg);
+}
+
+.banner button {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.composer {
   display: flex;
   gap: 8px;
   margin: 16px 0;
 }
 
-.app__composer input {
+.composer input {
   flex: 1;
   padding: 8px;
 }
 
-.app__notes {
+.empty {
+  color: var(--muted);
+}
+
+.notes {
   list-style: none;
   padding: 0;
 }
@@ -66,7 +118,7 @@ body {
   display: flex;
   gap: 12px;
   padding: 8px 0;
-  border-bottom: 1px solid color-mix(in srgb, var(--muted) 30%, transparent);
+  border-bottom: 1px solid var(--line);
 }
 
 .note time {
@@ -88,4 +140,21 @@ body {
 
 .note--confused time {
   color: var(--confused);
+}
+
+.recordings ul {
+  list-style: none;
+  padding: 0;
+}
+
+.recordings li {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.recordings audio {
+  width: 100%;
 }

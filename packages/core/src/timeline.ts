@@ -1,4 +1,11 @@
-import type { Note, TranscriptSegment } from './schemas'
+import type { Note, Session, TranscriptSegment } from './schemas'
+
+/**
+ * Total recorded time of a session. Recordings are laid end to end on the session
+ * timeline, so a new recording (and the notes taken during it) starts at this offset.
+ */
+export const sessionDurationMs = (session: Pick<Session, 'recordings'>): number =>
+  session.recordings.reduce((total, recording) => total + recording.durationMs, 0)
 
 const NOT_FOUND = -1
 

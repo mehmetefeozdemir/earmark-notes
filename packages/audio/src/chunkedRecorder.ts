@@ -1,9 +1,9 @@
 /** The subset of the browser MediaRecorder API this module depends on. */
 export interface MediaRecorderLike {
   readonly state: RecordingState
-  ondataavailable: ((event: { data: Blob }) => void) | null
-  onstop: (() => void) | null
-  onerror: ((event: Event) => void) | null
+  ondataavailable: ((event: BlobEvent) => void) | null
+  onstop: ((event: Event) => void) | null
+  onerror: ((event: ErrorEvent) => void) | null
   start(timeslice?: number): void
   pause(): void
   resume(): void
@@ -50,7 +50,7 @@ export class ChunkedRecorder {
     const { mediaRecorder } = options
     mediaRecorder.ondataavailable = (event) => this.handleData(event.data)
     mediaRecorder.onerror = (event) => {
-      this.failure ??= new Error(`Media recorder failed: ${event.type}`)
+      this.failure ??= new Error(`Media recorder failed: ${event.message || event.type}`)
     }
   }
 

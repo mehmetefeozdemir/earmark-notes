@@ -19,6 +19,8 @@
   "dependencies": {
     "@lecture-notes/core": "*",
     "react": "^19.3.0",
-    "react-dom": "^19.3.0"
+    "react-dom": "^19.3.0",
+    "@lecture-notes/audio": "*",
+    "@lecture-notes/storage": "*"
   }
 }

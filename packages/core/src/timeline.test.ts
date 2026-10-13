@@ -1,6 +1,27 @@
 import { describe, expect, test } from 'vitest'
-import { findSegmentIndexAt, notesBetween } from './timeline'
-import type { Note, TranscriptSegment } from './schemas'
+import { findSegmentIndexAt, notesBetween, sessionDurationMs } from './timeline'
+import type { Note, Recording, TranscriptSegment } from './schemas'
+
+describe('sessionDurationMs', () => {
+  const recording = (id: string, durationMs: number): Recording => ({
+    id,
+    startedAt: '2026-10-13T09:00:00.000Z',
+    durationMs,
+    source: 'mic',
+    mimeType: 'audio/webm',
+    chunks: [],
+  })
+
+  test('is zero for a session without recordings', () => {
+    expect(sessionDurationMs({ recordings: [] })).toBe(0)
+  })
+
+  test('sums the recordings, so a new recording continues the session timeline', () => {
+    expect(sessionDurationMs({ recordings: [recording('a', 60_000), recording('b', 1_500)] })).toBe(
+      61_500,
+    )
+  })
+})
 
 const segments: TranscriptSegment[] = [
   { startMs: 0, endMs: 2_000, text: 'first' },
