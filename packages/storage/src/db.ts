@@ -1,4 +1,4 @@
-import type { Session } from '@lecture-notes/core'
+import type { RecordingDraft, Session } from '@lecture-notes/core'
 import { Dexie, type EntityTable } from 'dexie'
 
 export const DEFAULT_DB_NAME = 'lecture-notes'
@@ -9,11 +9,13 @@ export const DEFAULT_DB_NAME = 'lecture-notes'
  */
 export class LectureNotesDb extends Dexie {
   sessions!: EntityTable<Session, 'id'>
+  recordingDrafts!: EntityTable<RecordingDraft, 'recordingId'>
 
   constructor(name: string = DEFAULT_DB_NAME) {
     super(name)
     this.version(1).stores({
       sessions: 'id, updatedAt',
+      recordingDrafts: 'recordingId, sessionId',
     })
   }
 }

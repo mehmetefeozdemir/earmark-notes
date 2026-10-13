@@ -1,2 +1,5 @@
+export * from './audioChunkStore'
 export * from './db'
+export * from './recordingDraftRepository'
+export * from './recovery'
 export * from './sessionRepository'

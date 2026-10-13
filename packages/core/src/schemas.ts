@@ -42,9 +42,9 @@ export const TranscriptSchema = z.object({
 })
 export type Transcript = z.infer<typeof TranscriptSchema>
 
-/** A slice of recorded audio persisted separately (e.g. in OPFS). */
+/** A slice of recorded audio persisted separately (e.g. in OPFS), keyed by its index. */
 export const AudioChunkSchema = z.object({
-  id: z.string().min(1),
+  index: z.number().int().nonnegative(),
   offsetMs: z.number().int().nonnegative(),
   durationMs: z.number().int().nonnegative(),
   bytes: z.number().int().nonnegative(),
@@ -64,6 +64,20 @@ export const RecordingSchema = z.object({
   transcript: TranscriptSchema.optional(),
 })
 export type Recording = z.infer<typeof RecordingSchema>
+
+/**
+ * A recording in progress. Persisted after every chunk so an interrupted recording can be
+ * recovered into its session on the next launch.
+ */
+export const RecordingDraftSchema = z.object({
+  recordingId: z.string().min(1),
+  sessionId: z.string().min(1),
+  startedAt: z.iso.datetime(),
+  mimeType: z.string().min(1),
+  source: RecordingSourceSchema,
+  chunks: z.array(AudioChunkSchema),
+})
+export type RecordingDraft = z.infer<typeof RecordingDraftSchema>
 
 export const SessionSchema = z.object({
   schemaVersion: z.literal(SCHEMA_VERSION),
