@@ -1,0 +1,13 @@
+node_modules/
+dist/
+coverage/
+.vite/
+*.tsbuildinfo
+.DS_Store
+.env
+.env.*
+!.env.example
+playwright-report/
+test-results/
+# Personal notes (interview prep etc.) — never published
+private/

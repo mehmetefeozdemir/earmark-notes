@@ -1,0 +1,91 @@
+:root {
+  --bg: #fafafa;
+  --fg: #1a1a1a;
+  --muted: #6b6b6b;
+  --accent: #2f6fed;
+  --important: #d93636;
+  --question: #d97a00;
+  --confused: #1a9a86;
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141414;
+    --fg: #ededed;
+    --muted: #9a9a9a;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.app__header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.app__header h1 {
+  flex: 1;
+  font-size: 1.4rem;
+}
+
+.app__clock {
+  font-variant-numeric: tabular-nums;
+  font-size: 1.2rem;
+}
+
+.app__composer {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.app__composer input {
+  flex: 1;
+  padding: 8px;
+}
+
+.app__notes {
+  list-style: none;
+  padding: 0;
+}
+
+.note {
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--muted) 30%, transparent);
+}
+
+.note time {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.note--heading span {
+  font-weight: 700;
+}
+
+.note--important time {
+  color: var(--important);
+}
+
+.note--question time {
+  color: var(--question);
+}
+
+.note--confused time {
+  color: var(--confused);
+}
