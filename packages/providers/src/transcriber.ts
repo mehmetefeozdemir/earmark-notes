@@ -13,18 +13,8 @@ export interface BatchTranscriber {
   transcribe(audio: Blob, options?: TranscribeOptions): Promise<Transcript>
 }
 
-export type TranscriptionErrorKind =
-  'invalid-key' | 'rate-limited' | 'too-large' | 'network' | 'provider-error' | 'invalid-response'
-
-/** A failure the UI can explain to the user, classified by what they can do about it. */
-export class TranscriptionError extends Error {
-  override readonly name = 'TranscriptionError'
-
-  constructor(
-    readonly kind: TranscriptionErrorKind,
-    message: string,
-    options?: ErrorOptions,
-  ) {
-    super(message, options)
-  }
-}
+/** Transcription failures use the shared provider error type. */
+export {
+  ProviderError as TranscriptionError,
+  type ProviderErrorKind as TranscriptionErrorKind,
+} from './providerError'

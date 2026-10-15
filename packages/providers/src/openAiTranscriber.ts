@@ -1,15 +1,12 @@
 import type { Transcript } from '@earmark/core'
 import { z } from 'zod'
-import {
-  TranscriptionError,
-  type BatchTranscriber,
-  type TranscribeOptions,
-  type TranscriptionErrorKind,
-} from './transcriber'
+import { errorFromResponse, networkError, ProviderError } from './providerError'
+import type { BatchTranscriber, TranscribeOptions } from './transcriber'
 
 const ENDPOINT = 'https://api.openai.com/v1/audio/transcriptions'
 const MODEL = 'whisper-1'
 const PROVIDER_ID = 'openai'
+const PROVIDER_NAME = 'OpenAI'
 const MS_PER_SECOND = 1_000
 const BYTES_PER_MB = 1024 * 1024
 
@@ -26,13 +23,6 @@ const VerboseTranscriptionSchema = z.object({
     }),
   ),
 })
-
-const STATUS_KIND: Readonly<Record<number, TranscriptionErrorKind>> = {
-  401: 'invalid-key',
-  403: 'invalid-key',
-  413: 'too-large',
-  429: 'rate-limited',
-}
 
 const FILE_EXTENSIONS: Readonly<Record<string, string>> = {
   'audio/webm': 'webm',
@@ -69,13 +59,18 @@ export class OpenAiTranscriber implements BatchTranscriber {
 
   async transcribe(audio: Blob, { language, signal }: TranscribeOptions = {}): Promise<Transcript> {
     if (audio.size > this.maxUploadBytes) {
-      throw new TranscriptionError(
+      throw new ProviderError(
         'too-large',
         `Recording is ${Math.ceil(audio.size / BYTES_PER_MB)} MB; OpenAI accepts up to 25 MB.`,
       )
     }
     const response = await this.send(audio, language, signal)
-    if (!response.ok) throw await this.httpError(response)
+    if (!response.ok) {
+      throw await errorFromResponse(response, {
+        apiKey: this.options.apiKey,
+        providerName: PROVIDER_NAME,
+      })
+    }
     return this.parse(await response.json().catch(() => undefined))
   }
 
@@ -98,28 +93,14 @@ export class OpenAiTranscriber implements BatchTranscriber {
         ...(signal ? { signal } : {}),
       })
     } catch (cause) {
-      throw new TranscriptionError('network', 'Could not reach OpenAI. Check your connection.', {
-        cause,
-      })
+      throw networkError(PROVIDER_NAME, cause)
     }
-  }
-
-  private async httpError(response: Response): Promise<TranscriptionError> {
-    const kind = STATUS_KIND[response.status] ?? 'provider-error'
-    const body: unknown = await response.json().catch(() => undefined)
-    const providerMessage = z.object({ error: z.object({ message: z.string() }) }).safeParse(body)
-    const detail = providerMessage.success
-      ? providerMessage.data.error.message
-      : response.statusText
-    // Providers sometimes echo the key back; never let it reach logs or the UI.
-    const safeDetail = detail.split(this.options.apiKey).join('[redacted]')
-    return new TranscriptionError(kind, `OpenAI ${response.status}: ${safeDetail}`)
   }
 
   private parse(body: unknown): Transcript {
     const parsed = VerboseTranscriptionSchema.safeParse(body)
     if (!parsed.success) {
-      throw new TranscriptionError('invalid-response', 'OpenAI returned an unexpected response.', {
+      throw new ProviderError('invalid-response', 'OpenAI returned an unexpected response.', {
         cause: parsed.error,
       })
     }

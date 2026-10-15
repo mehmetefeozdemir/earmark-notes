@@ -14,6 +14,8 @@ const MESSAGES: Readonly<Record<TranscriptionErrorKind, string>> = {
   network: 'Could not reach OpenAI. Check your internet connection and try again.',
   'invalid-response': 'OpenAI sent an unexpected response. Please try again.',
   'provider-error': 'OpenAI had a problem transcribing this recording. Please try again later.',
+  'model-unavailable': 'Your OpenAI account cannot use this model. Check your plan or project.',
+  'invalid-json': 'The model sent a malformed answer. Please try again.',
 }
 
 export const transcriptionErrorMessage = (error: unknown): string => {
