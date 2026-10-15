@@ -1,6 +1,17 @@
+import { GenerationError } from '@earmark/ai-features'
 import { TranscriptionError } from '@earmark/providers'
 import { describe, expect, test } from 'vitest'
-import { maskApiKey, transcriptionErrorMessage } from './transcriptionText'
+import { maskApiKey, studyAidErrorMessage, transcriptionErrorMessage } from './transcriptionText'
+
+describe('studyAidErrorMessage', () => {
+  test('explains output that could not be verified', () => {
+    expect(studyAidErrorMessage(new GenerationError('bad'))).toMatch(/could not be verified/i)
+  })
+
+  test('reuses provider explanations such as an invalid key', () => {
+    expect(studyAidErrorMessage(new TranscriptionError('invalid-key', 'x'))).toMatch(/api key/i)
+  })
+})
 
 describe('maskApiKey', () => {
   test('shows only the last four characters', () => {

@@ -1,3 +1,4 @@
+import { GenerationError } from '@earmark/ai-features'
 import { TranscriptionError, type TranscriptionErrorKind } from '@earmark/providers'
 
 const VISIBLE_KEY_CHARS = 4
@@ -13,7 +14,7 @@ const MESSAGES: Readonly<Record<TranscriptionErrorKind, string>> = {
   'too-large': 'This recording is too long for OpenAI (25 MB limit, about 70 minutes).',
   network: 'Could not reach OpenAI. Check your internet connection and try again.',
   'invalid-response': 'OpenAI sent an unexpected response. Please try again.',
-  'provider-error': 'OpenAI had a problem transcribing this recording. Please try again later.',
+  'provider-error': 'OpenAI had a problem with this request. Please try again later.',
   'model-unavailable': 'Your OpenAI account cannot use this model. Check your plan or project.',
   'invalid-json': 'The model sent a malformed answer. Please try again.',
 }
@@ -22,4 +23,14 @@ export const transcriptionErrorMessage = (error: unknown): string => {
   if (error instanceof TranscriptionError) return MESSAGES[error.kind]
   if (error instanceof Error) return `Transcription failed: ${error.message}`
   return 'Transcription failed.'
+}
+
+/** Errors from outline/quiz generation, explained in user terms. */
+export const studyAidErrorMessage = (error: unknown): string => {
+  if (error instanceof GenerationError) {
+    return 'The AI answer could not be verified against the transcript. Please try again.'
+  }
+  if (error instanceof TranscriptionError) return MESSAGES[error.kind]
+  if (error instanceof Error) return `Generation failed: ${error.message}`
+  return 'Generation failed.'
 }

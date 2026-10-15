@@ -22,6 +22,7 @@
     "react-dom": "^19.3.0",
     "@earmark/audio": "*",
     "@earmark/storage": "*",
-    "@earmark/providers": "*"
+    "@earmark/providers": "*",
+    "@earmark/ai-features": "*"
   }
 }

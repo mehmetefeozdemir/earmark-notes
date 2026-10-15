@@ -231,3 +231,103 @@ body {
   font-variant-numeric: tabular-nums;
   flex-shrink: 0;
 }
+
+.study-aid__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.study-aid h3 {
+  font-size: 1rem;
+  margin: 16px 0 4px;
+}
+
+.outline,
+.quiz {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.outline__section {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  padding: 6px 0;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.outline__section:hover,
+.outline__section:focus-visible {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+.outline__section time {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.outline__summary {
+  display: block;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.quiz__question {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.quiz__choices {
+  display: grid;
+  gap: 6px;
+}
+
+.quiz__choice {
+  padding: 6px 10px;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.quiz__choice:disabled {
+  cursor: default;
+}
+
+.quiz__choice--correct {
+  border-color: var(--confused);
+  background: color-mix(in srgb, var(--confused) 20%, transparent);
+}
+
+.quiz__choice--wrong {
+  border-color: var(--important);
+  background: color-mix(in srgb, var(--important) 20%, transparent);
+}
+
+.quiz__feedback {
+  font-size: 0.9rem;
+}
+
+.quiz__score {
+  font-weight: 600;
+}
+
+.transcript-toggle {
+  margin-top: 12px;
+}
+
+.transcript-toggle summary {
+  cursor: pointer;
+  color: var(--muted);
+}

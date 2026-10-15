@@ -6,6 +6,7 @@ import { NoteList } from './components/NoteList'
 import { RecordingControls } from './components/RecordingControls'
 import { RecordingList } from './components/RecordingList'
 import { SettingsPanel } from './components/SettingsPanel'
+import { useStudyAids } from './useStudyAids'
 import { useTranscription } from './useTranscription'
 import { services } from './services'
 import { useRecorder } from './useRecorder'
@@ -30,6 +31,7 @@ interface SessionViewProps {
 const SessionView = ({ session, mutate, runAndReload }: SessionViewProps) => {
   const recorder = useRecorder({ runAndReload })
   const transcription = useTranscription({ mutate })
+  const studyAids = useStudyAids({ mutate })
   const stopwatch = useStopwatch()
   // Recordings are laid end to end, so the live position continues after earlier ones.
   const timelineOffsetMs = sessionDurationMs(session)
@@ -79,6 +81,10 @@ const SessionView = ({ session, mutate, runAndReload }: SessionViewProps) => {
         recordings={session.recordings}
         statuses={transcription.statuses}
         onTranscribe={(recording) => void transcription.transcribe(recording)}
+        studyAids={{
+          generate: (recording, kind) => void studyAids.generate(recording, kind),
+          statusFor: studyAids.statusFor,
+        }}
       />
     </>
   )
