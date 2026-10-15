@@ -1,11 +1,18 @@
 import type { Recording } from '@earmark/core'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { fixMediaDuration } from '../fixMediaDuration'
 import { formatTimestamp } from '../formatTimestamp'
 import { services } from '../services'
 
 const RecordingPlayer = ({ recording }: { readonly recording: Recording }) => {
   const [url, setUrl] = useState<string>()
   const [error, setError] = useState<string>()
+  const audioRef = useRef<HTMLAudioElement>(null)
+
+  useEffect(() => {
+    const audio = audioRef.current
+    return audio ? fixMediaDuration(audio) : undefined
+  }, [url])
 
   useEffect(() => {
     let objectUrl: string | undefined
@@ -30,7 +37,7 @@ const RecordingPlayer = ({ recording }: { readonly recording: Recording }) => {
 
   if (error) return <p role="alert">{error}</p>
   if (!url) return <p>Loading audio…</p>
-  return <audio controls preload="metadata" src={url} />
+  return <audio ref={audioRef} controls preload="metadata" src={url} />
 }
 
 interface RecordingListProps {
