@@ -54,6 +54,39 @@ export type AudioChunk = z.infer<typeof AudioChunkSchema>
 export const RecordingSourceSchema = z.enum(['mic', 'tab', 'tab+mic', 'import'])
 export type RecordingSource = z.infer<typeof RecordingSourceSchema>
 
+/** A chapter of a recording; `startSegmentIndex` points into its transcript segments. */
+export const OutlineSectionSchema = z.object({
+  title: z.string().trim().min(1),
+  summary: z.string(),
+  startSegmentIndex: z.number().int().nonnegative(),
+})
+export type OutlineSection = z.infer<typeof OutlineSectionSchema>
+
+export const OutlineSchema = z.object({
+  model: z.string().min(1),
+  createdAt: z.iso.datetime(),
+  sections: z.array(OutlineSectionSchema).min(1),
+})
+export type Outline = z.infer<typeof OutlineSchema>
+
+/** A multiple-choice question grounded in one transcript segment. */
+export const QuizQuestionSchema = z.object({
+  id: z.string().min(1),
+  question: z.string().trim().min(1),
+  choices: z.array(z.string().trim().min(1)).min(2).max(6),
+  correctIndex: z.number().int().nonnegative(),
+  explanation: z.string(),
+  sourceSegmentIndex: z.number().int().nonnegative(),
+})
+export type QuizQuestion = z.infer<typeof QuizQuestionSchema>
+
+export const QuizSchema = z.object({
+  model: z.string().min(1),
+  createdAt: z.iso.datetime(),
+  questions: z.array(QuizQuestionSchema).min(1),
+})
+export type Quiz = z.infer<typeof QuizSchema>
+
 export const RecordingSchema = z.object({
   id: z.string().min(1),
   startedAt: z.iso.datetime(),
@@ -62,6 +95,8 @@ export const RecordingSchema = z.object({
   mimeType: z.string().min(1),
   chunks: z.array(AudioChunkSchema),
   transcript: TranscriptSchema.optional(),
+  outline: OutlineSchema.optional(),
+  quiz: QuizSchema.optional(),
 })
 export type Recording = z.infer<typeof RecordingSchema>
 
