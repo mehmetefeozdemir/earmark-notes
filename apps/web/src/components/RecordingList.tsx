@@ -1,18 +1,26 @@
 import type { Recording } from '@earmark/core'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type RefObject } from 'react'
 import { fixMediaDuration } from '../fixMediaDuration'
 import { formatTimestamp } from '../formatTimestamp'
 import { services } from '../services'
+import type { TranscriptionStatus } from '../useTranscription'
+import { TranscriptView } from './TranscriptView'
 
-const RecordingPlayer = ({ recording }: { readonly recording: Recording }) => {
+const MS_PER_SECOND = 1_000
+
+interface RecordingPlayerProps {
+  readonly recording: Recording
+  readonly audioRef: RefObject<HTMLAudioElement | null>
+}
+
+const RecordingPlayer = ({ recording, audioRef }: RecordingPlayerProps) => {
   const [url, setUrl] = useState<string>()
   const [error, setError] = useState<string>()
-  const audioRef = useRef<HTMLAudioElement>(null)
 
   useEffect(() => {
     const audio = audioRef.current
     return audio ? fixMediaDuration(audio) : undefined
-  }, [url])
+  }, [url, audioRef])
 
   useEffect(() => {
     let objectUrl: string | undefined
@@ -40,24 +48,61 @@ const RecordingPlayer = ({ recording }: { readonly recording: Recording }) => {
   return <audio ref={audioRef} controls preload="metadata" src={url} />
 }
 
-interface RecordingListProps {
-  readonly recordings: readonly Recording[]
+interface RecordingItemProps {
+  readonly recording: Recording
+  readonly position: number
+  readonly status: TranscriptionStatus | undefined
+  readonly onTranscribe: (recording: Recording) => void
 }
 
-export const RecordingList = ({ recordings }: RecordingListProps) => {
+const RecordingItem = ({ recording, position, status, onTranscribe }: RecordingItemProps) => {
+  const audioRef = useRef<HTMLAudioElement>(null)
+  const isBusy = status?.busy ?? false
+
+  const seek = (ms: number) => {
+    const audio = audioRef.current
+    if (!audio) return
+    audio.currentTime = ms / MS_PER_SECOND
+    void audio.play()
+  }
+
+  return (
+    <li>
+      <div className="recording__header">
+        <span>
+          #{position + 1} · {formatTimestamp(recording.durationMs)}
+        </span>
+        <button type="button" disabled={isBusy} onClick={() => onTranscribe(recording)}>
+          {isBusy ? 'Transcribing…' : recording.transcript ? 'Transcribe again' : 'Transcribe'}
+        </button>
+      </div>
+      <RecordingPlayer recording={recording} audioRef={audioRef} />
+      {status?.error && <p role="alert">{status.error}</p>}
+      {recording.transcript && <TranscriptView transcript={recording.transcript} onSeek={seek} />}
+    </li>
+  )
+}
+
+interface RecordingListProps {
+  readonly recordings: readonly Recording[]
+  readonly statuses: Readonly<Record<string, TranscriptionStatus>>
+  readonly onTranscribe: (recording: Recording) => void
+}
+
+export const RecordingList = ({ recordings, statuses, onTranscribe }: RecordingListProps) => {
   if (recordings.length === 0) return null
   return (
     <section aria-label="Recordings" className="recordings">
       <h2>Recordings</h2>
       <ul>
         {recordings.map((recording, position) => (
-          <li key={recording.id}>
-            <span>
-              #{position + 1} · {formatTimestamp(recording.durationMs)} · {recording.chunks.length}{' '}
-              chunks
-            </span>
-            <RecordingPlayer recording={recording} />
-          </li>
+          <RecordingItem
+            key={recording.id}
+            recording={recording}
+            position={position}
+            status={statuses[recording.id]}
+            onTranscribe={onTranscribe}
+          />
         ))}
       </ul>
     </section>

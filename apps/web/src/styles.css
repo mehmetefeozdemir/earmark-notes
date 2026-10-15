@@ -158,3 +158,76 @@ body {
 .recordings audio {
   width: 100%;
 }
+
+.settings {
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.settings summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.settings__note {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.settings__form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings__form input {
+  flex: 1;
+  min-width: 200px;
+  padding: 6px;
+}
+
+.recording__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.transcript ol {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+}
+
+.transcript__meta {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin: 8px 0 0;
+}
+
+.transcript__segment {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  padding: 4px 0;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.transcript__segment:hover,
+.transcript__segment:focus-visible {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+.transcript__segment time {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}

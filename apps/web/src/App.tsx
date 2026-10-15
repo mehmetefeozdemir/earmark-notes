@@ -5,6 +5,8 @@ import { NoteComposer } from './components/NoteComposer'
 import { NoteList } from './components/NoteList'
 import { RecordingControls } from './components/RecordingControls'
 import { RecordingList } from './components/RecordingList'
+import { SettingsPanel } from './components/SettingsPanel'
+import { useTranscription } from './useTranscription'
 import { services } from './services'
 import { useRecorder } from './useRecorder'
 import { useSessionStore } from './useSessionStore'
@@ -27,6 +29,7 @@ interface SessionViewProps {
 
 const SessionView = ({ session, mutate, runAndReload }: SessionViewProps) => {
   const recorder = useRecorder({ runAndReload })
+  const transcription = useTranscription({ mutate })
   const stopwatch = useStopwatch()
   // Recordings are laid end to end, so the live position continues after earlier ones.
   const timelineOffsetMs = sessionDurationMs(session)
@@ -72,7 +75,11 @@ const SessionView = ({ session, mutate, runAndReload }: SessionViewProps) => {
       {recorder.error && <Banner tone="error">{recorder.error}</Banner>}
       <NoteComposer onSubmit={handleNote} />
       <NoteList notes={session.notes} />
-      <RecordingList recordings={session.recordings} />
+      <RecordingList
+        recordings={session.recordings}
+        statuses={transcription.statuses}
+        onTranscribe={(recording) => void transcription.transcribe(recording)}
+      />
     </>
   )
 }
@@ -83,6 +90,7 @@ export const App = () => {
 
   return (
     <main className="app">
+      <SettingsPanel />
       {!services.audioIsPersistent && (
         <Banner tone="error">
           This browser cannot store audio on disk; recordings will be lost when you close the tab.
