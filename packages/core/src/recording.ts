@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import {
   RecordingDraftSchema,
+  TranscriptSchema,
+  type Transcript,
   type Recording,
   type RecordingDraft,
   type RecordingSource,
@@ -65,4 +67,24 @@ export const attachRecording = (session: Session, recording: Recording, now: str
     throw new Error(`Recording "${recording.id}" is already attached to session "${session.id}"`)
   }
   return { ...session, recordings: [...session.recordings, recording], updatedAt: now }
+}
+
+/** Stores (or replaces) the transcript of one recording. Segment times are relative to it. */
+export const attachTranscript = (
+  session: Session,
+  recordingId: string,
+  transcript: Transcript,
+  now: string,
+): Session => {
+  if (!session.recordings.some((recording) => recording.id === recordingId)) {
+    throw new Error(`Recording "${recordingId}" not found in session "${session.id}"`)
+  }
+  const validTranscript = TranscriptSchema.parse(transcript)
+  return {
+    ...session,
+    recordings: session.recordings.map((recording) =>
+      recording.id === recordingId ? { ...recording, transcript: validTranscript } : recording,
+    ),
+    updatedAt: now,
+  }
 }

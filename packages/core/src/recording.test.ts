@@ -1,7 +1,73 @@
 import { describe, expect, test } from 'vitest'
-import { appendChunk, attachRecording, finalizeDraft, startRecordingDraft } from './recording'
-import type { RecordingDraft } from './schemas'
+import {
+  appendChunk,
+  attachRecording,
+  attachTranscript,
+  finalizeDraft,
+  startRecordingDraft,
+} from './recording'
+import type { RecordingDraft, Transcript } from './schemas'
 import { createSession } from './session'
+
+describe('attachTranscript', () => {
+  const T0 = '2026-10-15T09:00:00.000Z'
+  const T1 = '2026-10-15T09:10:00.000Z'
+  const transcript: Transcript = {
+    provider: 'openai',
+    model: 'whisper-1',
+    language: 'english',
+    createdAt: T1,
+    segments: [{ startMs: 0, endMs: 1_000, text: 'Hello' }],
+  }
+  const sessionWithRecording = () => {
+    const draft = appendChunk(
+      startRecordingDraft({
+        recordingId: 'rec-1',
+        sessionId: 's1',
+        startedAt: T0,
+        mimeType: 'audio/webm',
+        source: 'mic',
+      }),
+      { index: 0, durationMs: 1_000, bytes: 10 },
+    )
+    return attachRecording(
+      createSession({ id: 's1', title: 'Bio', now: T0 }),
+      finalizeDraft(draft),
+      T0,
+    )
+  }
+
+  test('stores the transcript on the recording without mutating the session', () => {
+    const session = sessionWithRecording()
+
+    const updated = attachTranscript(session, 'rec-1', transcript, T1)
+
+    expect(updated.recordings[0]?.transcript).toEqual(transcript)
+    expect(updated.updatedAt).toBe(T1)
+    expect(session.recordings[0]?.transcript).toBeUndefined()
+  })
+
+  test('replaces an earlier transcript (e.g. re-transcribed with another provider)', () => {
+    const once = attachTranscript(sessionWithRecording(), 'rec-1', transcript, T1)
+    const replacement = { ...transcript, provider: 'groq', model: 'whisper-large-v3' }
+
+    const twice = attachTranscript(once, 'rec-1', replacement, T1)
+
+    expect(twice.recordings[0]?.transcript?.provider).toBe('groq')
+  })
+
+  test('throws for an unknown recording', () => {
+    expect(() => attachTranscript(sessionWithRecording(), 'missing', transcript, T1)).toThrow(
+      /not found/,
+    )
+  })
+
+  test('rejects an invalid transcript', () => {
+    const invalid = { ...transcript, segments: [{ startMs: 5, endMs: 1, text: 'x' }] }
+
+    expect(() => attachTranscript(sessionWithRecording(), 'rec-1', invalid, T1)).toThrow()
+  })
+})
 
 const STARTED_AT = '2026-10-13T09:00:00.000Z'
 const NOW = '2026-10-13T10:00:00.000Z'
