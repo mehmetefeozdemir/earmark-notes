@@ -6,10 +6,10 @@ import {
   finalizeDraft,
   startRecordingDraft,
   type RecordingDraft,
-} from '@lecture-notes/core'
+} from '@earmark/core'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { MemoryAudioChunkStore } from './audioChunkStore'
-import { LectureNotesDb } from './db'
+import { EarmarkDb } from './db'
 import { DexieRecordingDraftRepository } from './recordingDraftRepository'
 import { recoverInterruptedRecordings } from './recovery'
 import { DexieSessionRepository } from './sessionRepository'
@@ -17,13 +17,13 @@ import { DexieSessionRepository } from './sessionRepository'
 const STARTED_AT = '2026-10-13T09:00:00.000Z'
 const NOW = '2026-10-13T12:00:00.000Z'
 
-let db: LectureNotesDb
+let db: EarmarkDb
 let sessions: DexieSessionRepository
 let drafts: DexieRecordingDraftRepository
 let chunks: MemoryAudioChunkStore
 
 beforeEach(() => {
-  db = new LectureNotesDb(`test-${crypto.randomUUID()}`)
+  db = new EarmarkDb(`test-${crypto.randomUUID()}`)
   sessions = new DexieSessionRepository(db)
   drafts = new DexieRecordingDraftRepository(db)
   chunks = new MemoryAudioChunkStore()

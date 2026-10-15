@@ -1,5 +1,5 @@
 {
-  "name": "@lecture-notes/core",
+  "name": "@earmark/core",
   "version": "0.0.0",
   "private": true,
   "type": "module",

@@ -1,5 +1,5 @@
 {
-  "name": "@lecture-notes/web",
+  "name": "@earmark/web",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -17,10 +17,10 @@
     "vite": "^8.3.4"
   },
   "dependencies": {
-    "@lecture-notes/core": "*",
+    "@earmark/core": "*",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
-    "@lecture-notes/audio": "*",
-    "@lecture-notes/storage": "*"
+    "@earmark/audio": "*",
+    "@earmark/storage": "*"
   }
 }

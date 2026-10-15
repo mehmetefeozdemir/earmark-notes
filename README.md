@@ -1,4 +1,4 @@
-# Lecture Notes (working title)
+# Earmark Notes
 
 **Local-first, open-source lecture notes with AI — bring your own key, or run fully on-device.**
 

@@ -1,5 +1,5 @@
-import { addNote, sessionDurationMs, type NoteKind, type Session } from '@lecture-notes/core'
-import type { RecoveryReport } from '@lecture-notes/storage'
+import { addNote, sessionDurationMs, type NoteKind, type Session } from '@earmark/core'
+import type { RecoveryReport } from '@earmark/storage'
 import { Banner } from './components/Banner'
 import { NoteComposer } from './components/NoteComposer'
 import { NoteList } from './components/NoteList'

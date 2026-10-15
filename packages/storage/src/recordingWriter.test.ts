@@ -1,8 +1,8 @@
 import 'fake-indexeddb/auto'
-import { createSession } from '@lecture-notes/core'
+import { createSession } from '@earmark/core'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { MemoryAudioChunkStore } from './audioChunkStore'
-import { LectureNotesDb } from './db'
+import { EarmarkDb } from './db'
 import { DexieRecordingDraftRepository } from './recordingDraftRepository'
 import { RecordingWriter } from './recordingWriter'
 import { DexieSessionRepository } from './sessionRepository'
@@ -11,13 +11,13 @@ const STARTED_AT = '2026-10-13T09:00:00.000Z'
 const NOW = '2026-10-13T09:30:00.000Z'
 const MIME = 'audio/webm;codecs=opus'
 
-let db: LectureNotesDb
+let db: EarmarkDb
 let sessions: DexieSessionRepository
 let drafts: DexieRecordingDraftRepository
 let chunks: MemoryAudioChunkStore
 
 beforeEach(async () => {
-  db = new LectureNotesDb(`test-${crypto.randomUUID()}`)
+  db = new EarmarkDb(`test-${crypto.randomUUID()}`)
   sessions = new DexieSessionRepository(db)
   drafts = new DexieRecordingDraftRepository(db)
   chunks = new MemoryAudioChunkStore()

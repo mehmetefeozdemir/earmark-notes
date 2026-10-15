@@ -1,5 +1,5 @@
-import { createSession, type Session } from '@lecture-notes/core'
-import { recoverInterruptedRecordings, type RecoveryReport } from '@lecture-notes/storage'
+import { createSession, type Session } from '@earmark/core'
+import { recoverInterruptedRecordings, type RecoveryReport } from '@earmark/storage'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { requestPersistentStorage, services } from './services'
 

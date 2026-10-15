@@ -1,13 +1,13 @@
-import type { RecordingDraft, Session } from '@lecture-notes/core'
+import type { RecordingDraft, Session } from '@earmark/core'
 import { Dexie, type EntityTable } from 'dexie'
 
-export const DEFAULT_DB_NAME = 'lecture-notes'
+export const DEFAULT_DB_NAME = 'earmark-notes'
 
 /**
  * IndexedDB schema. Once a version has shipped, never edit it in place:
  * add a new version (with an upgrade step if data must be transformed).
  */
-export class LectureNotesDb extends Dexie {
+export class EarmarkDb extends Dexie {
   sessions!: EntityTable<Session, 'id'>
   recordingDrafts!: EntityTable<RecordingDraft, 'recordingId'>
 

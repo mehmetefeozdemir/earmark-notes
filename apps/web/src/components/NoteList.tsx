@@ -1,4 +1,4 @@
-import type { Note } from '@lecture-notes/core'
+import type { Note } from '@earmark/core'
 import { formatTimestamp } from '../formatTimestamp'
 
 interface NoteListProps {

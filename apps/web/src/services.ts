@@ -1,16 +1,16 @@
 import {
   DexieRecordingDraftRepository,
   DexieSessionRepository,
-  LectureNotesDb,
+  EarmarkDb,
   MemoryAudioChunkStore,
   OpfsAudioChunkStore,
   type AudioChunkStore,
-} from '@lecture-notes/storage'
+} from '@earmark/storage'
 
 const supportsOpfs = (): boolean =>
   typeof navigator !== 'undefined' && typeof navigator.storage?.getDirectory === 'function'
 
-const db = new LectureNotesDb()
+const db = new EarmarkDb()
 
 /** Single wiring point for persistence; components never construct storage themselves. */
 export const services = {

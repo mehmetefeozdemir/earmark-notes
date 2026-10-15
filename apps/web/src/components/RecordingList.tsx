@@ -1,4 +1,4 @@
-import type { Recording } from '@lecture-notes/core'
+import type { Recording } from '@earmark/core'
 import { useEffect, useState } from 'react'
 import { formatTimestamp } from '../formatTimestamp'
 import { services } from '../services'

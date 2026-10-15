@@ -1,5 +1,5 @@
 {
-  "name": "lecture-notes",
+  "name": "earmark-notes",
   "private": true,
   "license": "AGPL-3.0-only",
   "workspaces": [
@@ -7,7 +7,7 @@
     "apps/*"
   ],
   "scripts": {
-    "dev": "npm run dev -w @lecture-notes/web",
+    "dev": "npm run dev -w @earmark/web",
     "build": "npm run build --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "eslint .",

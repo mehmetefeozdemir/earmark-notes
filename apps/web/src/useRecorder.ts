@@ -1,6 +1,6 @@
-import { ChunkedRecorder, pickSupportedMimeType } from '@lecture-notes/audio'
-import type { Recording } from '@lecture-notes/core'
-import { RecordingWriter } from '@lecture-notes/storage'
+import { ChunkedRecorder, pickSupportedMimeType } from '@earmark/audio'
+import type { Recording } from '@earmark/core'
+import { RecordingWriter } from '@earmark/storage'
 import { useCallback, useRef, useState } from 'react'
 import { services } from './services'
 

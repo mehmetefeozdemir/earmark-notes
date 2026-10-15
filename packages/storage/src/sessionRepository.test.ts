@@ -1,18 +1,18 @@
 import 'fake-indexeddb/auto'
-import { addNote, createSession, type Session } from '@lecture-notes/core'
+import { addNote, createSession, type Session } from '@earmark/core'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
-import { LectureNotesDb } from './db'
+import { EarmarkDb } from './db'
 import { DexieSessionRepository, SessionCorruptedError } from './sessionRepository'
 
 const T0 = '2026-10-13T09:00:00.000Z'
 const T1 = '2026-10-13T10:00:00.000Z'
 const T2 = '2026-10-13T11:00:00.000Z'
 
-let db: LectureNotesDb
+let db: EarmarkDb
 let repository: DexieSessionRepository
 
 beforeEach(() => {
-  db = new LectureNotesDb(`test-${crypto.randomUUID()}`)
+  db = new EarmarkDb(`test-${crypto.randomUUID()}`)
   repository = new DexieSessionRepository(db)
 })
 

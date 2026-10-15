@@ -1,5 +1,5 @@
-import { SessionSchema, type Session } from '@lecture-notes/core'
-import type { LectureNotesDb } from './db'
+import { SessionSchema, type Session } from '@earmark/core'
+import type { EarmarkDb } from './db'
 
 export interface SessionSummary {
   readonly id: string
@@ -44,7 +44,7 @@ const rowId = (row: unknown): string =>
 
 /** Session persistence on IndexedDB. Every read and write is schema-validated. */
 export class DexieSessionRepository implements SessionRepository {
-  constructor(private readonly db: LectureNotesDb) {}
+  constructor(private readonly db: EarmarkDb) {}
 
   async list(): Promise<SessionList> {
     // Read by primary key, not the `updatedAt` index: IndexedDB leaves rows without the

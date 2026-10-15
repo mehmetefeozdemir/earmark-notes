@@ -5,7 +5,7 @@ import {
   type Recording,
   type RecordingDraft,
   type Session,
-} from '@lecture-notes/core'
+} from '@earmark/core'
 import type { AudioChunkStore } from './audioChunkStore'
 import type { RecordingDraftRepository } from './recordingDraftRepository'
 import type { SessionRepository } from './sessionRepository'

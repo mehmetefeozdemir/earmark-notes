@@ -1,5 +1,5 @@
-import { RecordingDraftSchema, type RecordingDraft } from '@lecture-notes/core'
-import type { LectureNotesDb } from './db'
+import { RecordingDraftSchema, type RecordingDraft } from '@earmark/core'
+import type { EarmarkDb } from './db'
 
 export interface RecordingDraftList {
   readonly drafts: readonly RecordingDraft[]
@@ -19,7 +19,7 @@ const rowId = (row: unknown): string =>
 
 /** Drafts of in-progress recordings, written after every chunk. */
 export class DexieRecordingDraftRepository implements RecordingDraftRepository {
-  constructor(private readonly db: LectureNotesDb) {}
+  constructor(private readonly db: EarmarkDb) {}
 
   async save(draft: RecordingDraft): Promise<void> {
     await this.db.recordingDrafts.put(RecordingDraftSchema.parse(draft))

@@ -1,4 +1,4 @@
-import type { NoteKind } from '@lecture-notes/core'
+import type { NoteKind } from '@earmark/core'
 import { useState, type FormEvent } from 'react'
 
 const NOTE_KINDS: readonly NoteKind[] = ['text', 'heading', 'important', 'question', 'confused']
