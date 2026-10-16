@@ -331,3 +331,8 @@ body {
   cursor: pointer;
   color: var(--muted);
 }
+
+.recording-controls__label {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
