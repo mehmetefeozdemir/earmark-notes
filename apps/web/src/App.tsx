@@ -1,10 +1,18 @@
-import { addNote, sessionDurationMs, type NoteKind, type Session } from '@earmark/core'
-import type { RecoveryReport } from '@earmark/storage'
+import {
+  addNote,
+  renameSession,
+  sessionDurationMs,
+  type NoteKind,
+  type Session,
+} from '@earmark/core'
+import type { RecoveryReport, SessionSummary } from '@earmark/storage'
 import { Banner } from './components/Banner'
 import { NoteComposer } from './components/NoteComposer'
 import { NoteList } from './components/NoteList'
 import { RecordingControls } from './components/RecordingControls'
 import { RecordingList } from './components/RecordingList'
+import { SessionPicker } from './components/SessionPicker'
+import { SessionTitle } from './components/SessionTitle'
 import { SettingsPanel } from './components/SettingsPanel'
 import { useStudyAids } from './useStudyAids'
 import { useTranscription } from './useTranscription'
@@ -26,9 +34,19 @@ interface SessionViewProps {
   readonly session: Session
   readonly mutate: (change: (session: Session) => Session) => Promise<void>
   readonly runAndReload: <T>(task: () => Promise<T>) => Promise<T>
+  readonly summaries: readonly SessionSummary[]
+  readonly onOpenSession: (id: string) => void
+  readonly onNewSession: () => void
 }
 
-const SessionView = ({ session, mutate, runAndReload }: SessionViewProps) => {
+const SessionView = ({
+  session,
+  mutate,
+  runAndReload,
+  summaries,
+  onOpenSession,
+  onNewSession,
+}: SessionViewProps) => {
   const recorder = useRecorder({ runAndReload })
   const transcription = useTranscription({ mutate })
   const studyAids = useStudyAids({ mutate })
@@ -61,10 +79,24 @@ const SessionView = ({ session, mutate, runAndReload }: SessionViewProps) => {
     void mutate((current) => addNote(current, note, new Date().toISOString()))
   }
 
+  const isBusy = isCapturing || recorder.status === 'starting' || recorder.status === 'stopping'
+
   return (
     <>
+      <SessionPicker
+        currentId={session.id}
+        summaries={summaries}
+        isLocked={isBusy}
+        onOpen={onOpenSession}
+        onNew={onNewSession}
+      />
       <header className="session-header">
-        <h1>{session.title}</h1>
+        <SessionTitle
+          title={session.title}
+          onRename={(title) =>
+            void mutate((current) => renameSession(current, title, new Date().toISOString()))
+          }
+        />
         <RecordingControls
           status={recorder.status}
           timelineMs={timelineOffsetMs + stopwatch.elapsedMs}
@@ -114,9 +146,14 @@ export const App = () => {
       )}
       {store.state.status === 'ready' && (
         <SessionView
+          // A new key per lecture resets recorder, clock and per-recording UI state.
+          key={store.state.session.id}
           session={store.state.session}
           mutate={store.mutate}
           runAndReload={store.runAndReload}
+          summaries={store.summaries}
+          onOpenSession={(id) => void store.openSession(id)}
+          onNewSession={() => void store.startNewSession()}
         />
       )}
     </main>

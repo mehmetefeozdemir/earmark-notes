@@ -1,10 +1,17 @@
 import { createSession, type Session } from '@earmark/core'
-import { recoverInterruptedRecordings, type RecoveryReport } from '@earmark/storage'
+import {
+  recoverInterruptedRecordings,
+  type RecoveryReport,
+  type SessionSummary,
+} from '@earmark/storage'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { defaultLectureTitle } from './lectureTitle'
 import { requestPersistentStorage, services } from './services'
 
 const nowIso = () => new Date().toISOString()
-const DEFAULT_TITLE = 'My first lecture'
+
+const newLecture = (): Session =>
+  createSession({ id: crypto.randomUUID(), title: defaultLectureTitle(new Date()), now: nowIso() })
 
 type StoreState =
   | { readonly status: 'loading' }
@@ -23,7 +30,7 @@ const loadInitialState = async (): Promise<InitialLoad> => {
   const latestId = sessions[0]?.id
   const existing = latestId ? await services.sessions.get(latestId) : undefined
   if (existing) return { session: existing, recovery }
-  const fresh = createSession({ id: crypto.randomUUID(), title: DEFAULT_TITLE, now: nowIso() })
+  const fresh = newLecture()
   await services.sessions.save(fresh)
   return { session: fresh, recovery }
 }
@@ -42,8 +49,13 @@ export const useSessionStore = () => {
   const [state, setState] = useState<StoreState>({ status: 'loading' })
   const [recovery, setRecovery] = useState<RecoveryReport>()
   const [saveError, setSaveError] = useState<string>()
+  const [summaries, setSummaries] = useState<readonly SessionSummary[]>([])
   const queue = useRef<Promise<unknown>>(Promise.resolve())
   const sessionId = state.status === 'ready' ? state.session.id : undefined
+
+  const refreshSummaries = useCallback(async () => {
+    setSummaries((await services.sessions.list()).sessions)
+  }, [])
 
   useEffect(() => {
     initialLoad ??= loadInitialState()
@@ -51,10 +63,11 @@ export const useSessionStore = () => {
       ({ session, recovery: report }) => {
         setState({ status: 'ready', session })
         setRecovery(report)
+        void refreshSummaries()
       },
       (error: unknown) => setState({ status: 'error', message: errorMessage(error) }),
     )
-  }, [])
+  }, [refreshSummaries])
 
   const exclusive = useCallback(<T>(task: () => Promise<T>): Promise<T> => {
     const run = queue.current.then(task, task)
@@ -78,12 +91,46 @@ export const useSessionStore = () => {
           await services.sessions.save(next)
           setState({ status: 'ready', session: next })
           setSaveError(undefined)
+          await refreshSummaries()
         } catch (error) {
           setSaveError(errorMessage(error))
         }
       })
     },
-    [exclusive, sessionId],
+    [exclusive, refreshSummaries, sessionId],
+  )
+
+  /** Opens another lecture. Callers must not switch while a recording is in progress. */
+  const openSession = useCallback(
+    (id: string) =>
+      exclusive(async () => {
+        try {
+          const session = await services.sessions.get(id)
+          if (!session) throw new Error('That lecture no longer exists')
+          setState({ status: 'ready', session })
+          setSaveError(undefined)
+        } catch (error) {
+          setSaveError(errorMessage(error))
+        }
+      }),
+    [exclusive],
+  )
+
+  /** Creates an empty lecture whose timeline starts at 0:00, and opens it. */
+  const startNewSession = useCallback(
+    () =>
+      exclusive(async () => {
+        try {
+          const session = newLecture()
+          await services.sessions.save(session)
+          setState({ status: 'ready', session })
+          setSaveError(undefined)
+          await refreshSummaries()
+        } catch (error) {
+          setSaveError(errorMessage(error))
+        }
+      }),
+    [exclusive, refreshSummaries],
   )
 
   /** Runs a task that writes the session itself (e.g. committing a recording), then reloads. */
@@ -101,10 +148,13 @@ export const useSessionStore = () => {
 
   return {
     state,
+    summaries,
     recovery,
     saveError,
     mutate,
     runAndReload,
+    openSession,
+    startNewSession,
     dismissRecovery: () => setRecovery(undefined),
   }
 }
